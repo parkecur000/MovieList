@@ -2,41 +2,55 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
-    ViewBag.Title = "Recently Added Movies";
+    ViewBag.Title = "Movie List";
 }
-@model IEnumerable<MovieList.Models.Movies>
+@model IEnumerable<Movies>
 
 <div>
-    <h2>Here are the most recently added movies</h2>
-    <table>
-        <thead>
+    <h2>Movie List</h2>
+    <table class="table">
+        <thead class="thead">
             <tr>
-                <th>Category</th>
-                <th>Title</th>
-                <th>Year</th>
-                <th>Director</th>
-                <th>Rating</th>
-                <th>Edited</th>
-                <th>Lent To:</th>
-                <th>Notes</th>
+                <th scope="col">Category</th>
+                <th scope="col">Title</th>
+                <th scope="col">Year</th>
+                <th scope="col">Director</th>
+                <th scope="col">Rating</th>
+                <th scope="col">Edited</th>
+                <th scope="col">Lent To:</th>
+                <th scope="col">Notes</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
             </tr>
         </thead>
 
         <tbody>
-            @foreach (MovieList.Models.Movies x in Model)
+            @foreach (Movies x in Model)
             {
                 @if (x.title != "Independence Day")
                 {
-                    <tr>
-                        <td>@x.category</td>
-                        <td>@x.title</td>
-                        <td>@x.year</td>
-                        <td>@x.director</td>
-                        <td>@x.rating</td>
-                        <td>@x.edited</td>
-                        <td>@x.lent_to</td>
-                        <td>@x.notes</td>
-                    </tr>
+            <tr>
+                <td>@x.category</td>
+                <td>@x.title</td>
+                <td>@x.year</td>
+                <td>@x.director</td>
+                <td>@x.rating</td>
+                <td>@x.edited</td>
+                <td>@x.lent_to</td>
+                <td>@x.notes</td>
+                <td>
+                    <form asp-action="RemoveMovie" method="post">
+                        <input type="hidden" name="MovieId" value="@x.id" />
+                        <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="EditMovieForm" method="post">
+                        <input type="hidden" name="MovieId" value="@x.id" />
+                        <button type="submit" class="btn btn-sm">Edit</button>
+                    </form>
+                </td>
+            </tr>
                  }
              }
         </tbody>

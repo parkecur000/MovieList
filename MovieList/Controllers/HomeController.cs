@@ -13,9 +13,14 @@ namespace MovieList.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        private IMovieRepository _repository;
+        private MovieListDbContext _context;
+
+        public HomeController(ILogger<HomeController> logger, IMovieRepository repository, MovieListDbContext con)
         {
             _logger = logger;
+            _repository = repository;
+            _context = con;
         }
 
         public IActionResult Index()
@@ -41,13 +46,46 @@ namespace MovieList.Controllers
             }
             else
             {
-                TempStorage.AddMovie(appResponse); //Adds the movie to the movies list by calling the AddMovie method
+                _context.Add(appResponse);
+                _context.SaveChanges();
                 return View("Confirmation", appResponse);
             }
         }
         public IActionResult NewMoviesDisplay()
         {
-            return View(TempStorage.Movies);
+            return View(_repository.Movies);
+        }
+
+        //The actions below were added to allow users to remove movies and to edit Movie records
+        [HttpPost]
+        public IActionResult RemoveMovie(int MovieId)
+        {
+            Movies Movie = _context.Movies.Find(MovieId);
+            _context.Movies.Remove(Movie);
+            _context.SaveChanges();
+            return RedirectToAction("NewMoviesDisplay");
+        }
+        [HttpPost]
+        public IActionResult EditMovieForm(int MovieId)
+        {
+            Movies Movie = _context.Movies.Single(m => m.id == MovieId);
+            return View(Movie);
+        }
+        [HttpPost]
+        public IActionResult EditMovie(Movies Movie)
+        {
+            if(ModelState.IsValid)
+            { 
+                Movies OldMovie = _context.Movies.Single(m => m.id == Movie.id);
+                _context.Movies.Remove(OldMovie);
+                _context.Movies.Add(Movie);
+                _context.SaveChanges();
+                return RedirectToAction("NewMoviesDisplay");
+            }
+            else
+            {
+                return RedirectToAction("NewMoviesDisplay");
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

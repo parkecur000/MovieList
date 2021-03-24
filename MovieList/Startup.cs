@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MovieList.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +27,16 @@ namespace MovieList
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            //Added these services to be able to use the database. I also added the disdributed memory cache, session, and scope so I can play around with that later, but not for assignment 9.
+            services.AddDbContext<MovieListDbContext>(options =>
+                { 
+                options.UseSqlite(Configuration["ConnectionStrings:MovieListConnection"]);
+                });
+            services.AddScoped<IMovieRepository, EFMovieRepository>();
+
+            services.AddDistributedMemoryCache();
+            services.AddSession();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
